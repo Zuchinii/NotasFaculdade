@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Notas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #resultado {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        function validarNota(input, maximo) {
+            let valor = parseFloat(input.value);
+            if (valor < 0) {
+                input.value = 0;
+            } else if (valor > maximo) {
+                input.value = maximo;
+            }
+        }
+
+        async function enviarNotas() {
+            const apiUrl = "https://wbu4ngkvdh.execute-api.sa-east-1.amazonaws.com/APITest/EnviarNotas"; // Substitua pela URL correta
+            const body = {
+                nota1: parseFloat(document.getElementById("nota1").value),
+                nota2: parseFloat(document.getElementById("nota2").value),
+                nota3: parseFloat(document.getElementById("nota3").value)
+            };
+
+            try {
+                let response = await fetch(apiUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                let data = await response.json();
+                document.getElementById("resultado").innerText = `Resultado: ${data.resultado} (Soma: ${data.soma})`;
+            } catch (error) {
+                document.getElementById("resultado").innerText = "Erro ao enviar notas!";
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Calculadora de Notas</h2>
+        <input type="number" id="nota1" placeholder="Digite a Nota A1" min="0" max="30" oninput="validarNota(this, 30)">
+        <input type="number" id="nota2" placeholder="Digite a Nota A2" min="0" max="30" oninput="validarNota(this, 30)">
+        <input type="number" id="nota3" placeholder="Digite a Nota A3" min="0" max="40" oninput="validarNota(this, 40)">
+        <button onclick="enviarNotas()">Calcular</button>
+        <p id="resultado"></p>
+    </div>
+</body>
+</html>
